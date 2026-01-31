@@ -8,6 +8,14 @@ const router = Router();
 // Save game stats
 router.post("/", authenticateUser, async (req: AuthRequest, res: Response) => {
   try {
+    // Check if session already exists
+    const existingSession = await gameStatsRepository.findBySessionId(req.body.session_id);
+    
+    if (existingSession) {
+      // Session already saved, return existing data
+      return res.status(200).json(existingSession);
+    }
+
     const statsData: CreateGameStatsInput = {
       user_id: req.user!.id,
       session_id: req.body.session_id,

@@ -11,23 +11,57 @@ export class LeaderboardRepository {
    * Get global leaderboard by score
    */
   async getGlobalLeaderboard(limit: number = 100): Promise<LeaderboardEntry[]> {
-    const { data, error } = await supabase
-      .from("game_stats")
-      .select(
-        `
-        *,
-        profiles:user_id (username)
-      `,
-      )
-      .order("final_score", { ascending: false })
-      .limit(limit);
+    // Use a subquery to get the best score per user, then join with game_stats to get full details
+    const { data, error } = await supabase.rpc('get_best_scores_per_user', {
+      result_limit: limit
+    });
 
     if (error) {
-      throw error;
+      // If the RPC doesn't exist, fall back to application-level logic
+      console.warn('RPC get_best_scores_per_user not found, using fallback logic');
+      
+      // Get all game stats with profiles
+      const { data: allStats, error: statsError } = await supabase
+        .from("game_stats")
+        .select(
+          `
+          *,
+          profiles:user_id (username)
+        `,
+        )
+        .order("final_score", { ascending: false });
+
+      if (statsError) {
+        throw statsError;
+      }
+
+      // Group by user and keep only the best score
+      const bestScoresMap = new Map<string, any>();
+      
+      for (const entry of allStats) {
+        const userId = entry.user_id;
+        if (!bestScoresMap.has(userId) || entry.final_score > bestScoresMap.get(userId).final_score) {
+          bestScoresMap.set(userId, entry);
+        }
+      }
+
+      // Convert to array, sort by score, and limit
+      const bestScores = Array.from(bestScoresMap.values())
+        .sort((a, b) => b.final_score - a.final_score)
+        .slice(0, limit);
+
+      return bestScores.map((entry: any) => ({
+        username: entry.profiles?.username || "Anonymous",
+        score: entry.final_score,
+        entropy: entry.final_entropy,
+        phase: entry.phase_reached,
+        won: entry.won,
+        playedAt: entry.played_at,
+      }));
     }
 
     return data.map((entry: any) => ({
-      username: entry.profiles?.username || "Anonymous",
+      username: entry.username || "Anonymous",
       score: entry.final_score,
       entropy: entry.final_entropy,
       phase: entry.phase_reached,
@@ -135,14 +169,28 @@ export class LeaderboardRepository {
       `,
       )
       .gte("played_at", startDate.toISOString())
-      .order("final_score", { ascending: false })
-      .limit(limit);
+      .order("final_score", { ascending: false });
 
     if (error) {
       throw error;
     }
 
-    return data.map((entry: any) => ({
+    // Group by user and keep only the best score
+    const bestScoresMap = new Map<string, any>();
+    
+    for (const entry of data) {
+      const userId = entry.user_id;
+      if (!bestScoresMap.has(userId) || entry.final_score > bestScoresMap.get(userId).final_score) {
+        bestScoresMap.set(userId, entry);
+      }
+    }
+
+    // Convert to array, sort by score, and limit
+    const bestScores = Array.from(bestScoresMap.values())
+      .sort((a, b) => b.final_score - a.final_score)
+      .slice(0, limit);
+
+    return bestScores.map((entry: any) => ({
       username: entry.profiles?.username || "Anonymous",
       score: entry.final_score,
       entropy: entry.final_entropy,
