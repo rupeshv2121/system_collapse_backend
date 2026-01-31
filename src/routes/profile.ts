@@ -1,6 +1,7 @@
 import { Response, Router } from "express";
-import { supabase } from "../config/supabase";
 import { authenticateUser, AuthRequest } from "../middleware/auth";
+import type { CreateProfileInput, UpdateProfileInput } from "../models";
+import { profileRepository } from "../models";
 
 const router = Router();
 
@@ -17,21 +18,13 @@ router.get(
         return res.status(403).json({ error: "Unauthorized access" });
       }
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+      const profile = await profileRepository.findById(userId);
 
-      if (error) {
-        if (error.code === "PGRST116") {
-          // Profile not found
-          return res.status(404).json({ error: "Profile not found" });
-        }
-        throw error;
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
       }
 
-      res.json(data);
+      res.json(profile);
     } catch (error) {
       console.error("Error fetching profile:", error);
       res.status(500).json({ error: "Failed to fetch profile" });
@@ -42,15 +35,13 @@ router.get(
 // Get current user profile
 router.get("/", authenticateUser, async (req: AuthRequest, res: Response) => {
   try {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", req.user!.id)
-      .single();
+    const profile = await profileRepository.findById(req.user!.id);
 
-    if (error) throw error;
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
 
-    res.json(data);
+    res.json(profile);
   } catch (error) {
     console.error("Error fetching profile:", error);
     res.status(500).json({ error: "Failed to fetch profile" });
@@ -61,7 +52,6 @@ router.get("/", authenticateUser, async (req: AuthRequest, res: Response) => {
 router.post("/", authenticateUser, async (req: AuthRequest, res: Response) => {
   try {
     const {
-      user_id,
       username,
       avatar_url,
       bio,
@@ -76,43 +66,27 @@ router.post("/", authenticateUser, async (req: AuthRequest, res: Response) => {
       psychological_archetype,
     } = req.body;
 
-    // Use authenticated user's ID
-    const userId = req.user!.id;
-    const userEmail = req.user!.email;
+    // Use authenticated user's ID and email
+    const profileData: CreateProfileInput = {
+      id: req.user!.id,
+      email: req.user!.email,
+      username,
+      avatar_url,
+      bio,
+      play_style,
+      risk_tolerance,
+      adaptability_score,
+      patience_score,
+      chaos_affinity,
+      order_affinity,
+      learning_rate,
+      stress_response,
+      psychological_archetype,
+    };
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: userId,
-          email: userEmail,
-          username: username || userEmail?.split("@")[0],
-          avatar_url,
-          bio,
-          play_style,
-          risk_tolerance,
-          adaptability_score,
-          patience_score,
-          chaos_affinity,
-          order_affinity,
-          learning_rate,
-          stress_response,
-          psychological_archetype,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "id",
-        },
-      )
-      .select()
-      .single();
+    const profile = await profileRepository.upsert(profileData);
 
-    if (error) {
-      console.error("Supabase upsert error:", error);
-      throw error;
-    }
-
-    res.status(200).json(data);
+    res.status(200).json(profile);
   } catch (error: any) {
     console.error("Error upserting profile:", error);
     res.status(500).json({
@@ -125,18 +99,24 @@ router.post("/", authenticateUser, async (req: AuthRequest, res: Response) => {
 // Update user profile
 router.put("/", authenticateUser, async (req: AuthRequest, res: Response) => {
   try {
-    const { username } = req.body;
+    const updates: UpdateProfileInput = {
+      username: req.body.username,
+      avatar_url: req.body.avatar_url,
+      bio: req.body.bio,
+      play_style: req.body.play_style,
+      risk_tolerance: req.body.risk_tolerance,
+      adaptability_score: req.body.adaptability_score,
+      patience_score: req.body.patience_score,
+      chaos_affinity: req.body.chaos_affinity,
+      order_affinity: req.body.order_affinity,
+      learning_rate: req.body.learning_rate,
+      stress_response: req.body.stress_response,
+      psychological_archetype: req.body.psychological_archetype,
+    };
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .update({ username, updated_at: new Date().toISOString() })
-      .eq("id", req.user!.id)
-      .select()
-      .single();
+    const profile = await profileRepository.update(req.user!.id, updates);
 
-    if (error) throw error;
-
-    res.json(data);
+    res.json(profile);
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ error: "Failed to update profile" });
