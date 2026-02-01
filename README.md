@@ -1,25 +1,25 @@
-# System Collapse Backend - Complete Documentation
+# System Collapse Backend - (Documentation)
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Technology Stack](#technology-stack)
-3. [Project Architecture](#project-architecture)
-4. [Installation & Setup](#installation--setup)
-5. [Environment Configuration](#environment-configuration)
-6. [Database Schema](#database-schema)
-7. [API Endpoints Reference](#api-endpoints-reference)
-8. [Authentication & Security](#authentication--security)
-9. [Data Models & Types](#data-models--types)
-10. [Repository Pattern](#repository-pattern)
-11. [Middleware](#middleware)
-12. [Services](#services)
-13. [Error Handling](#error-handling)
-14. [Development Workflow](#development-workflow)
-15. [Deployment Guide](#deployment-guide)
-16. [Testing & Debugging](#testing--debugging)
-17. [Performance Optimization](#performance-optimization)
-18. [Common Issues & Solutions](#common-issues--solutions)
+- [Overview](#overview)
+- [Technology Stack](#technology-stack)
+- [Project Architecture](#project-architecture)
+- [Installation & Setup](#installation--setup)
+- [Environment Configuration](#environment-configuration)
+- [Database Schema](#database-schema)
+- [API Endpoints Reference](#api-endpoints-reference)
+- [Authentication & Security](#authentication--security)
+- [Data Models & Types](#data-models--types)
+- [Repository Pattern](#repository-pattern)
+- [Middleware](#middleware)
+- [Services](#services)
+- [Error Handling](#error-handling)
+- [Development Workflow](#development-workflow)
+- [Deployment Guide](#deployment-guide)
+- [Testing & Debugging](#testing--debugging)
+- [Performance Optimization](#performance-optimization)
+- [Common Issues & Solutions](#common-issues--solutions)
 
 ---
 
@@ -51,28 +51,6 @@ The System Collapse Backend is a RESTful API server built with Node.js and Expre
 | Express.js | 4.21+ | Web framework |
 | Supabase | 2.45+ | Database & Authentication |
 | PostgreSQL | 15+ | Database (via Supabase) |
-
-### Key Dependencies
-
-```json
-{
-  "dependencies": {
-    "@supabase/supabase-js": "^2.45.4",    // Supabase client
-    "cors": "^2.8.5",                       // Cross-origin support
-    "dotenv": "^16.6.1",                    // Environment variables
-    "express": "^4.21.2",                   // Web framework
-    "express-validator": "^7.2.0",          // Request validation
-    "nodemailer": "^7.0.13"                 // Email service
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",           // TypeScript types
-    "@types/node": "^22.10.5",              // Node.js types
-    "nodemon": "^3.1.9",                    // Auto-restart dev server
-    "ts-node": "^10.9.2",                   // TypeScript execution
-    "typescript": "^5.7.3"                  // TypeScript compiler
-  }
-}
-```
 
 ---
 
@@ -213,35 +191,6 @@ npm start
 ```
 
 The server will start on `http://localhost:3000`
-
----
-
-## Environment Configuration
-
-### Required Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `SUPABASE_URL` | Your Supabase project URL | `https://abc123.supabase.co` |
-| `SUPABASE_ANON_KEY` | Supabase anonymous/public key | `eyJhbGci...` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (admin) | `eyJhbGci...` |
-| `PORT` | Server port | `3000` |
-| `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:5173` |
-
-### Optional Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `EMAIL_USER` | Gmail account for sending emails | `game@gmail.com` |
-| `EMAIL_PASSWORD` | Gmail app password | `xxxx xxxx xxxx xxxx` |
-
-### Getting Supabase Credentials
-
-1. Go to [supabase.com](https://supabase.com) and create a project
-2. Navigate to **Settings → API**
-3. Copy the **Project URL** → `SUPABASE_URL`
-4. Copy the **anon/public** key → `SUPABASE_ANON_KEY`
-5. Copy the **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`
 
 ---
 
@@ -794,26 +743,6 @@ Get players with most wins
 
 ---
 
-#### **GET** `/api/leaderboard/period/:period`
-Get leaderboard for specific time period
-
-**Parameters:**
-- `period` (path) - One of: `day`, `week`, `month`, `all`
-
-**Query Parameters:**
-- `limit` (optional) - Number of results (default: 100)
-
-**Response (200):** Same format as global leaderboard
-
-**Response (400):**
-```json
-{
-  "error": "Invalid period. Use: day, week, month, or all"
-}
-```
-
----
-
 ### Email Endpoints
 
 #### **POST** `/api/email/share-profile`
@@ -903,15 +832,6 @@ Content-Type: application/json
 - Users can only access their own data
 - Leaderboard data is publicly readable
 - Admin operations require service role key
-
-#### CORS Configuration
-
-```typescript
-app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
-  credentials: true
-}))
-```
 
 #### Environment Variables
 
@@ -1315,8 +1235,6 @@ await sendProfileEmail(
 )
 ```
 
-**Setup Guide:** See `EMAIL_SETUP.md`
-
 ---
 
 ## Error Handling
@@ -1355,56 +1273,6 @@ Or with validation errors:
 | 403 | Forbidden | Access denied (not your resource) |
 | 404 | Not Found | Resource doesn't exist |
 | 500 | Internal Server Error | Unexpected server errors |
-
-### Error Handling Best Practices
-
-#### 1. Try-Catch Blocks
-
-```typescript
-router.get('/endpoint', async (req, res) => {
-  try {
-    // Logic here
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Failed to process request' });
-  }
-})
-```
-
-#### 2. Input Validation
-
-```typescript
-import { body, validationResult } from 'express-validator'
-
-router.post('/endpoint',
-  [
-    body('email').isEmail(),
-    body('score').isInt({ min: 0 })
-  ],
-  (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    // Process request
-  }
-)
-```
-
-#### 3. Database Error Handling
-
-```typescript
-const { data, error } = await supabase
-  .from('table')
-  .select('*')
-
-if (error) {
-  if (error.code === 'PGRST116') {
-    return res.status(404).json({ error: 'Not found' });
-  }
-  throw error;  // Let global handler catch it
-}
-```
 
 ---
 
@@ -1465,155 +1333,6 @@ Configuration in `tsconfig.json`:
   }
 }
 ```
-
-### Testing API Endpoints
-
-#### Using curl
-
-```bash
-# Test health check
-curl http://localhost:3000/
-
-# Test authenticated endpoint
-curl -H "Authorization: Bearer <token>" \
-  http://localhost:3000/api/profile
-
-# Test POST endpoint
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"final_score": 850}' \
-  http://localhost:3000/api/stats
-```
-
-#### Using Postman
-
-1. Create a new request
-2. Set method (GET, POST, PUT, DELETE)
-3. Set URL: `http://localhost:3000/api/...`
-4. Add headers:
-   - `Authorization: Bearer <token>`
-   - `Content-Type: application/json`
-5. Add body (for POST/PUT)
-6. Send request
-
-#### Using Thunder Client (VS Code)
-
-1. Install Thunder Client extension
-2. Create new request
-3. Configure as above
-4. Save to collection for reuse
-
----
-
-## Deployment Guide
-
-### Deployment Options
-
-1. **Vercel** (Recommended for Node.js)
-2. **Railway**
-3. **Render**
-4. **Heroku**
-5. **AWS EC2**
-6. **DigitalOcean**
-
-### Vercel Deployment
-
-#### Step 1: Install Vercel CLI
-
-```bash
-npm install -g vercel
-```
-
-#### Step 2: Create `vercel.json`
-
-```json
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "src/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "src/index.ts"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
-}
-```
-
-#### Step 3: Deploy
-
-```bash
-# Login to Vercel
-vercel login
-
-# Deploy
-vercel
-
-# Deploy to production
-vercel --prod
-```
-
-#### Step 4: Set Environment Variables
-
-In Vercel Dashboard:
-1. Go to Project → Settings → Environment Variables
-2. Add all variables from `.env`
-3. Redeploy
-
-### Railway Deployment
-
-```bash
-# Install Railway CLI
-npm i -g @railway/cli
-
-# Login
-railway login
-
-# Initialize project
-railway init
-
-# Add environment variables
-railway variables set SUPABASE_URL=...
-
-# Deploy
-railway up
-```
-
-### Environment Variables for Production
-
-```env
-# Supabase
-SUPABASE_URL=https://prod.supabase.co
-SUPABASE_ANON_KEY=prod-key
-SUPABASE_SERVICE_ROLE_KEY=prod-service-key
-
-# Server
-PORT=3000
-FRONTEND_URL=https://yourdomain.com
-
-# Email
-EMAIL_USER=production-email@gmail.com
-EMAIL_PASSWORD=app-password
-```
-
-### Post-Deployment Checklist
-
-- [ ] Environment variables configured
-- [ ] Database migrations run
-- [ ] CORS configured with production URL
-- [ ] Health check endpoint working
-- [ ] Authentication tested
-- [ ] Error logging configured
-- [ ] Rate limiting enabled (if needed)
-- [ ] SSL/HTTPS enabled
 
 ---
 
@@ -1735,117 +1454,6 @@ Consider adding Redis for:
 
 ---
 
-## Common Issues & Solutions
-
-### Issue: "Missing Supabase environment variables"
-
-**Cause:** `.env` file missing or incorrect
-
-**Solution:**
-```bash
-# Copy example file
-cp .env.example .env
-
-# Edit with your credentials
-nano .env
-```
-
----
-
-### Issue: "Authentication failed"
-
-**Cause:** Invalid or expired JWT token
-
-**Solution:**
-1. Check token is being sent: `Authorization: Bearer <token>`
-2. Verify token is fresh (not expired)
-3. Test with new login from frontend
-4. Check Supabase Auth settings
-
----
-
-### Issue: "CORS error from frontend"
-
-**Cause:** CORS not configured correctly
-
-**Solution:**
-
-Update `src/index.ts`:
-```typescript
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}))
-```
-
-Add to `.env`:
-```env
-FRONTEND_URL=http://localhost:5173
-```
-
----
-
-### Issue: "Failed to send email"
-
-**Cause:** Email credentials not configured
-
-**Solution:**
-1. Follow `EMAIL_SETUP.md` guide
-2. Get Gmail App Password
-3. Add to `.env`:
-   ```env
-   EMAIL_USER=your-email@gmail.com
-   EMAIL_PASSWORD=xxxx xxxx xxxx xxxx
-   ```
-
----
-
-### Issue: "Database connection failed"
-
-**Cause:** Invalid Supabase credentials
-
-**Solution:**
-1. Verify credentials in Supabase Dashboard → Settings → API
-2. Check service role key (not anon key) is used
-3. Ensure database is not paused (free tier auto-pauses)
-
----
-
-### Issue: "Port already in use"
-
-**Cause:** Another process using port 3000
-
-**Solution:**
-```bash
-# Find process
-lsof -i :3000
-
-# Kill process
-kill -9 <PID>
-
-# Or use different port
-PORT=3001 npm run dev
-```
-
----
-
-### Issue: "TypeScript compilation errors"
-
-**Cause:** Type mismatches or missing types
-
-**Solution:**
-```bash
-# Check errors
-npx tsc --noEmit
-
-# Install missing types
-npm install --save-dev @types/package-name
-
-# Fix type errors in code
-```
-
----
-
 ## Additional Resources
 
 ### Official Documentation
@@ -1861,33 +1469,12 @@ npm install --save-dev @types/package-name
 - [Row Level Security Guide](https://supabase.com/docs/guides/auth/row-level-security)
 - [Database Functions](https://supabase.com/docs/guides/database/functions)
 
-### Related Project Files
-
-- `README.md` - Quick start guide
-- `EMAIL_SETUP.md` - Email configuration
-- `DATABASE_SETUP_USERNAME.md` - Username handling
-- `../DEPLOYMENT_GUIDE.md` - Full stack deployment
-- `../BACKEND_API_TESTING.md` - API testing guide
-
 ---
 
-## Conclusion
+🆘 Support
+For issues, questions, or contributions:
 
-This backend provides a robust, scalable foundation for the System Collapse game. The architecture follows best practices with:
-
-- ✅ Clear separation of concerns (Routes → Repositories → Database)
-- ✅ Type safety with TypeScript
-- ✅ Secure authentication with Supabase
-- ✅ Comprehensive data models for psychological analysis
-- ✅ Optimized database queries with indexes
-- ✅ RESTful API design
-- ✅ Error handling and validation
-- ✅ Easy deployment to cloud platforms
-
-For questions or issues, refer to the specific sections above or check the related documentation files.
-
----
-
-**Last Updated:** February 1, 2026  
-**Version:** 1.0.0  
-**Maintainer:** System Collapse Development Team
+Check existing issues in the repository
+Review this README thoroughly
+Contact the development team
+Built with ❤️ by Commit & Conquer Team
