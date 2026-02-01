@@ -1,0 +1,32 @@
+import nodemailer from "nodemailer";
+
+/**
+ * Send user profile statistics via email
+ * Uses Gmail SMTP or any other email service
+ */
+export async function sendProfileEmail(
+  to: string,
+  subject: string,
+  content: string
+): Promise<void> {
+  // Create transporter using environment variables
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD, // Use App Password for Gmail
+    },
+  });
+
+  // Email options
+  const mailOptions = {
+    from: `System Collapse <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    text: content,
+    html: `<pre style="font-family: monospace; white-space: pre-wrap;">${content}</pre>`,
+  };
+
+  // Send email
+  await transporter.sendMail(mailOptions);
+}

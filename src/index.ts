@@ -4,6 +4,7 @@ import express, { Application, Request, Response } from "express";
 import gameStatsRoutes from "./routes/gameStats";
 import leaderboardRoutes from "./routes/leaderboard";
 import profileRoutes from "./routes/profile";
+import emailRoutes from "./routes/email";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/profile", profileRoutes);
 app.use("/api/stats", gameStatsRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
+app.use("/api/email", emailRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: any) => {
