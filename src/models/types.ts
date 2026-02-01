@@ -26,7 +26,8 @@ export interface GameStats {
   final_sanity: number;
   phase_reached: number;
   won: boolean;
-  duration: number;
+  total_time: number;
+  collapse_count: number;
   total_clicks: number;
   average_click_speed: number;
   most_clicked_color: string;
@@ -122,7 +123,8 @@ export interface CreateGameStatsInput {
   final_sanity: number;
   phase_reached: number;
   won: boolean;
-  duration: number;
+  total_time: number;
+  collapse_count: number;
   total_clicks: number;
   average_click_speed: number;
   most_clicked_color: string;
