@@ -1297,41 +1297,182 @@ npm start
 npx tsc --noEmit
 ```
 
-### Development Tools
+**Key Tools**:
+- **Nodemon**: Auto-restarts server on file changes during development
+- **TypeScript**: Compiles to JavaScript for production (see `tsconfig.json`)
+- **ts-node**: Runs TypeScript directly in development mode
 
-#### Nodemon
+---
 
-Auto-restarts server when files change:
+## Deployment Guide
 
-```json
-{
-  "dev": "nodemon --exec ts-node src/index.ts"
-}
+### Production Build
+
+```bash
+# Build TypeScript to JavaScript
+npm run build
+
+# Output: dist/ folder with compiled .js files
 ```
 
-#### TypeScript
+### Deployment Platforms
 
-Compile TypeScript to JavaScript:
+#### Heroku
 
-```json
-{
-  "build": "tsc"
-}
+1. **Install Heroku CLI**:
+   ```bash
+   npm install -g heroku
+   ```
+
+2. **Create Heroku App**:
+   ```bash
+   heroku create system-collapse-api
+   ```
+
+3. **Set Environment Variables**:
+   ```bash
+   heroku config:set SUPABASE_URL=https://your-project.supabase.co
+   heroku config:set SUPABASE_ANON_KEY=your-anon-key
+   heroku config:set SUPABASE_SERVICE_ROLE_KEY=your-service-key
+   heroku config:set FRONTEND_URL=https://your-frontend.vercel.app
+   heroku config:set EMAIL_USER=your-email@gmail.com
+   heroku config:set EMAIL_PASSWORD=your-app-password
+   ```
+
+4. **Deploy**:
+   ```bash
+   git push heroku main
+   ```
+
+5. **View Logs**:
+   ```bash
+   heroku logs --tail
+   ```
+
+#### Railway
+
+1. **Create New Project** at [railway.app](https://railway.app)
+2. **Connect GitHub Repository**
+3. **Add Environment Variables** in Settings:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `FRONTEND_URL`
+   - `EMAIL_USER`
+   - `EMAIL_PASSWORD`
+4. **Deploy**: Automatic on git push
+
+#### Render
+
+1. **Create Web Service** at [render.com](https://render.com)
+2. **Build Command**: `npm install && npm run build`
+3. **Start Command**: `npm start`
+4. **Environment Variables**: Add in dashboard
+5. **Deploy**: Automatic on git push
+
+#### VPS (Ubuntu/Linux)
+
+1. **Install Node.js**:
+   ```bash
+   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   ```
+
+2. **Clone Repository**:
+   ```bash
+   git clone <repo-url>
+   cd system_collapse_backend
+   npm install
+   ```
+
+3. **Create .env File**:
+   ```bash
+   nano .env
+   # Add all environment variables
+   ```
+
+4. **Build**:
+   ```bash
+   npm run build
+   ```
+
+5. **Use PM2 for Process Management**:
+   ```bash
+   npm install -g pm2
+   pm2 start dist/index.js --name system-collapse-api
+   pm2 startup
+   pm2 save
+   ```
+
+6. **Set Up Nginx Reverse Proxy**:
+   ```nginx
+   server {
+       listen 80;
+       server_name api.yourdomain.com;
+
+       location / {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+       }
+   }
+   ```
+
+7. **Enable HTTPS with Let's Encrypt**:
+   ```bash
+   sudo apt install certbot python3-certbot-nginx
+   sudo certbot --nginx -d api.yourdomain.com
+   ```
+
+### Pre-Deployment Checklist
+
+- [ ] All environment variables set correctly
+- [ ] Supabase database schema deployed
+- [ ] Frontend CORS origin configured
+- [ ] Email service tested (if using)
+- [ ] Build completes without errors: `npm run build`
+- [ ] TypeScript compilation successful: `npx tsc --noEmit`
+- [ ] Test API endpoints with production credentials
+- [ ] Database RLS policies enabled
+- [ ] Service role key secured (never exposed to frontend)
+- [ ] HTTPS/SSL certificate configured
+- [ ] Monitor server logs for errors
+
+### Post-Deployment Testing
+
+```bash
+# Health check
+curl https://your-api-domain.com/
+
+# Test authenticated endpoint (replace with real token)
+curl -H "Authorization: Bearer <token>" \
+  https://your-api-domain.com/api/profile
+
+# Test leaderboard
+curl https://your-api-domain.com/api/leaderboard/global
 ```
 
-Configuration in `tsconfig.json`:
+### Monitoring & Logging
 
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true
-  }
-}
+**Recommended Tools**:
+- **Heroku**: Built-in logs via `heroku logs --tail`
+- **Railway**: Dashboard logs
+- **VPS**: PM2 logs via `pm2 logs`
+- **Third-party**: Sentry, LogRocket, DataDog
+
+**Health Monitoring**:
+```typescript
+// Add to index.ts
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  })
+})
 ```
 
 ---
@@ -1360,33 +1501,21 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ### Debug Logging
 
-Add console logs for debugging:
+Enable detailed logging at key points:
 
 ```typescript
-console.log('User ID:', req.user?.id)
+// Authentication
+console.log('Token:', token)
+console.log('User from token:', user)
+
+// Database operations
+console.log('Query result:', data)
+console.log('Query error:', error)
+
+// Request validation
 console.log('Request body:', req.body)
-console.log('Database result:', data)
+console.log('Validation errors:', errors.array())
 ```
-
-### Common Debug Points
-
-1. **Authentication Issues**
-   ```typescript
-   console.log('Token:', token)
-   console.log('User from token:', user)
-   ```
-
-2. **Database Queries**
-   ```typescript
-   console.log('Query result:', data)
-   console.log('Query error:', error)
-   ```
-
-3. **Request Validation**
-   ```typescript
-   console.log('Request body:', req.body)
-   console.log('Validation errors:', errors.array())
-   ```
 
 ### Supabase Dashboard Debugging
 
@@ -1433,24 +1562,211 @@ await supabase.rpc('get_best_scores_per_user', { result_limit: 100 })
 const stats = await gameStatsRepository.findByUserId(userId, 50)  // Limit 50
 ```
 
-#### Pagination (Future Enhancement)
-
-```typescript
-router.get('/stats/history', async (req: AuthRequest, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1
-  const limit = 20
-  const offset = (page - 1) * limit
-  
-  // Implement pagination logic
-})
-```
-
 ### Caching (Future Enhancement)
 
 Consider adding Redis for:
 - Leaderboard caching (update every 5 minutes)
 - User profile caching
 - Aggregate statistics caching
+
+---
+
+## Common Issues & Solutions
+
+### "Cannot connect to Supabase" Error
+
+**Symptoms**: Database queries fail, authentication doesn't work
+
+**Solutions**:
+1. Verify `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env`
+2. Check Supabase dashboard for project status
+3. Ensure network connectivity: `ping your-project.supabase.co`
+4. Verify API keys haven't been regenerated
+5. Check Supabase service status: [status.supabase.com](https://status.supabase.com)
+
+### "Authentication failed" / 401 Errors
+
+**Symptoms**: Protected endpoints return unauthorized
+
+**Solutions**:
+1. Check JWT token is valid (not expired)
+2. Verify `Authorization: Bearer <token>` header format
+3. Ensure token is from correct Supabase project
+4. Check auth middleware is applied to route
+5. Verify user exists in Supabase Auth
+
+### "Row Level Security policy violated" Error
+
+**Symptoms**: Database operations fail with RLS error
+
+**Solutions**:
+```sql
+-- Check if RLS policies exist
+SELECT * FROM pg_policies WHERE tablename = 'profiles';
+
+-- Temporarily disable RLS for testing (NOT for production)
+ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
+
+-- Re-create missing policies (see Database Schema section)
+```
+
+### Email Not Sending
+
+**Symptoms**: `/api/email/share-profile` returns success but no email received
+
+**Solutions**:
+1. **Gmail App Password**: Use app-specific password, not account password
+   - Go to Google Account → Security → 2-Step Verification → App passwords
+2. **Check credentials**: Verify `EMAIL_USER` and `EMAIL_PASSWORD` in `.env`
+3. **Test with nodemailer**:
+   ```typescript
+   await transporter.verify()
+   console.log('SMTP connection successful')
+   ```
+4. **Check spam folder**: Email might be filtered
+5. **Enable less secure apps** (not recommended): Google Account settings
+
+### Port Already in Use
+
+**Symptoms**: `Error: listen EADDRINUSE: address already in use :::3000`
+
+**Solutions**:
+```bash
+# Windows - Find and kill process
+netstat -ano | findstr :3000
+taskkill /PID <process_id> /F
+
+# Linux/Mac - Find and kill process
+lsof -i :3000
+kill -9 <PID>
+
+# Or use different port
+PORT=3001 npm run dev
+```
+
+### TypeScript Build Errors
+
+**Symptoms**: `npm run build` fails with type errors
+
+**Solutions**:
+```bash
+# Check specific errors
+npx tsc --noEmit
+
+# Clear build cache
+rm -rf dist/ node_modules/.cache
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Update TypeScript
+npm install typescript@latest --save-dev
+```
+
+### CORS Errors
+
+**Symptoms**: Frontend can't access API, browser shows CORS error
+
+**Solutions**:
+1. **Verify FRONTEND_URL** matches actual frontend domain
+2. **Check CORS configuration**:
+   ```typescript
+   app.use(cors({
+     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+     credentials: true,
+     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+     allowedHeaders: ['Content-Type', 'Authorization']
+   }))
+   ```
+3. **Production**: Update FRONTEND_URL to production domain
+4. **Multiple origins**:
+   ```typescript
+   origin: ['https://app.example.com', 'https://www.example.com']
+   ```
+
+### Database Connection Timeouts
+
+**Symptoms**: Queries hang or timeout
+
+**Solutions**:
+1. Check Supabase connection pooling limits
+2. Verify database isn't paused (free tier auto-pauses)
+3. Check network latency to Supabase region
+4. Implement connection retry logic
+5. Use database connection pooling
+
+### Session_id Already Exists Error
+
+**Symptoms**: Duplicate session error when saving game stats
+
+**Expected**: This is normal behavior - prevents duplicate submissions
+
+**Solution**: Frontend should generate unique session IDs (UUID v4)
+
+### Environment Variables Not Loading
+
+**Symptoms**: `undefined` values for `process.env.VARIABLE_NAME`
+
+**Solutions**:
+1. **Check .env file exists** in project root
+2. **Restart server** after changing .env
+3. **Verify dotenv is loaded**:
+   ```typescript
+   import 'dotenv/config'  // At top of index.ts
+   ```
+4. **Check for typos** in variable names
+5. **No spaces around =**:
+   ```env
+   # Wrong
+   PORT = 3000
+   
+   # Correct
+   PORT=3000
+   ```
+
+### High Memory Usage
+
+**Symptoms**: Server crashes or slows down over time
+
+**Solutions**:
+1. Implement result limiting in queries
+2. Add pagination for large datasets
+3. Close database connections properly
+4. Monitor with: `node --inspect dist/index.js`
+5. Use PM2 with memory limits:
+   ```bash
+   pm2 start dist/index.js --max-memory-restart 500M
+   ```
+
+### Debugging Tips
+
+1. **Enable detailed logging**:
+   ```typescript
+   console.log('User ID:', req.user?.id)
+   console.log('Request body:', JSON.stringify(req.body, null, 2))
+   console.log('Supabase error:', error)
+   ```
+
+2. **Test endpoints with curl**:
+   ```bash
+   # Test with verbose output
+   curl -v -H "Authorization: Bearer $TOKEN" \
+     http://localhost:3000/api/profile
+   ```
+
+3. **Use Postman/Insomnia** for API testing
+
+4. **Check Supabase logs**: Dashboard → Logs
+
+5. **Monitor server logs**:
+   ```bash
+   # Development
+   npm run dev
+   
+   # Production (PM2)
+   pm2 logs system-collapse-api
+   ```
 
 ---
 
@@ -1471,10 +1787,30 @@ Consider adding Redis for:
 
 ---
 
-🆘 Support
-For issues, questions, or contributions:
+## 🆘 Support
 
-Check existing issues in the repository
-Review this README thoroughly
-Contact the development team
-Built with ❤️ by Commit & Conquer Team
+For issues, questions, or contributions:
+1. Check existing issues in the repository
+2. Review this README thoroughly
+3. Test with Supabase dashboard SQL editor
+4. Check server logs for detailed errors
+5. Contact the development team
+
+---
+
+## 📄 License
+
+This project is part of a hackathon submission. All rights reserved by the development team.
+
+---
+
+## 📌 Version Information
+
+**Current Version**: 1.0.0  
+**Last Updated**: February 2026  
+**Minimum Node Version**: 18.0.0  
+**TypeScript Version**: 5.7+
+
+---
+
+**Built with ❤️ by Commit & Conquer Team**
