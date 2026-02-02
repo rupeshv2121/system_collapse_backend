@@ -1,14 +1,13 @@
-/**
- * GameStats Repository
- * Handles all database operations for game statistics
+/*
+Database operations for game statistics
  */
 
 import { supabase } from "../config/supabase";
 import type { AggregateStats, CreateGameStatsInput, GameStats } from "./types";
 
 export class GameStatsRepository {
-  /**
-   * Create new game stats entry
+  /*
+   Create new game stats entry
    */
   async create(statsData: CreateGameStatsInput): Promise<GameStats> {
     const { data, error } = await supabase
@@ -29,8 +28,8 @@ export class GameStatsRepository {
     return data;
   }
 
-  /**
-   * Get all game stats for a user
+  /*
+   Get all game stats for a user
    */
   async findByUserId(userId: string, limit: number = 50): Promise<GameStats[]> {
     const { data, error } = await supabase
@@ -47,8 +46,8 @@ export class GameStatsRepository {
     return data || [];
   }
 
-  /**
-   * Get game stats by session ID
+  /*
+   Get game stats by session ID
    */
   async findBySessionId(sessionId: string): Promise<GameStats | null> {
     const { data, error } = await supabase
@@ -67,9 +66,9 @@ export class GameStatsRepository {
     return data;
   }
 
-  /**
-   * Get aggregate statistics for a user
-   */
+  
+  // Get aggregate statistics for a user
+   
   async getAggregateStats(userId: string): Promise<AggregateStats> {
     const { data, error } = await supabase
       .from("game_stats")
@@ -104,9 +103,9 @@ export class GameStatsRepository {
     };
   }
 
-  /**
-   * Get recent games for a user
-   */
+  
+   // Get recent games 
+  
   async getRecentGames(
     userId: string,
     limit: number = 10,
@@ -114,9 +113,9 @@ export class GameStatsRepository {
     return this.findByUserId(userId, limit);
   }
 
-  /**
-   * Delete all game stats for a user
-   */
+  
+   // Delete all game stats 
+   
   async deleteByUserId(userId: string): Promise<void> {
     const { error } = await supabase
       .from("game_stats")
@@ -128,9 +127,9 @@ export class GameStatsRepository {
     }
   }
 
-  /**
-   * Get top scores across all users
-   */
+
+  // Get top scores 
+
   async getTopScores(limit: number = 100): Promise<GameStats[]> {
     const { data, error } = await supabase
       .from("game_stats")
@@ -145,9 +144,8 @@ export class GameStatsRepository {
     return data || [];
   }
 
-  /**
-   * Count total games played by user
-   */
+  // Count total games played 
+   
   async countByUserId(userId: string): Promise<number> {
     const { count, error } = await supabase
       .from("game_stats")
@@ -162,5 +160,4 @@ export class GameStatsRepository {
   }
 }
 
-// Export singleton instance
 export const gameStatsRepository = new GameStatsRepository();

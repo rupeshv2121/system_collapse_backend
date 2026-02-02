@@ -1,14 +1,13 @@
-/**
- * Profile Repository
- * Handles all database operations for user profiles
+/*
+Handles all database operations for user profiles
  */
 
 import { supabase } from "../config/supabase";
 import type { CreateProfileInput, Profile, UpdateProfileInput } from "./types";
 
 export class ProfileRepository {
-  /**
-   * Find profile by user ID
+  /*
+   Find profile by user ID
    */
   async findById(userId: string): Promise<Profile | null> {
     const { data, error } = await supabase
@@ -28,7 +27,7 @@ export class ProfileRepository {
   }
 
   /**
-   * Create or update profile (upsert)
+   * Create or update profile
    */
   async upsert(profileData: CreateProfileInput): Promise<Profile> {
     const { data, error } = await supabase

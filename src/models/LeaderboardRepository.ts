@@ -1,15 +1,12 @@
-/**
- * Leaderboard Repository
- * Handles all database operations for leaderboard data
- */
+//database operations for leaderboard data
 
 import { supabase } from "../config/supabase";
 import type { LeaderboardEntry, TopWinner } from "./types";
 
 export class LeaderboardRepository {
-  /**
-   * Get global leaderboard by score
-   */
+  
+  //  Get global leaderboard by score
+
   async getGlobalLeaderboard(limit: number = 100): Promise<LeaderboardEntry[]> {
     // Use a subquery to get the best score per user, then join with game_stats to get full details
     const { data, error } = await supabase.rpc("get_best_scores_per_user", {
@@ -136,9 +133,9 @@ export class LeaderboardRepository {
     return (count || 0) + 1; // Rank is count + 1
   }
 
-  /**
-   * Get leaderboard for a specific time period
-   */
+  
+  // Get leaderboard for a specific time period
+
   async getLeaderboardByPeriod(
     period: "day" | "week" | "month" | "all",
     limit: number = 100,
@@ -204,5 +201,4 @@ export class LeaderboardRepository {
   }
 }
 
-// Export singleton instance
 export const leaderboardRepository = new LeaderboardRepository();
