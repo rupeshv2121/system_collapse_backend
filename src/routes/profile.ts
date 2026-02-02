@@ -26,7 +26,6 @@ router.get(
 
       res.json(profile);
     } catch (error) {
-      console.error("Error fetching profile:", error);
       res.status(500).json({ error: "Failed to fetch profile" });
     }
   },
@@ -43,7 +42,6 @@ router.get("/", authenticateUser, async (req: AuthRequest, res: Response) => {
 
     res.json(profile);
   } catch (error) {
-    console.error("Error fetching profile:", error);
     res.status(500).json({ error: "Failed to fetch profile" });
   }
 });
@@ -88,7 +86,6 @@ router.post("/", authenticateUser, async (req: AuthRequest, res: Response) => {
 
     res.status(200).json(profile);
   } catch (error: any) {
-    console.error("Error upserting profile:", error);
     res.status(500).json({
       error: "Failed to update profile",
       details: error.message,
@@ -118,7 +115,6 @@ router.put("/", authenticateUser, async (req: AuthRequest, res: Response) => {
 
     res.json(profile);
   } catch (error) {
-    console.error("Error updating profile:", error);
     res.status(500).json({ error: "Failed to update profile" });
   }
 });

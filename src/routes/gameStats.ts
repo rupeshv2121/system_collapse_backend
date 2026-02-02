@@ -9,8 +9,10 @@ const router = Router();
 router.post("/", authenticateUser, async (req: AuthRequest, res: Response) => {
   try {
     // Check if session already exists
-    const existingSession = await gameStatsRepository.findBySessionId(req.body.session_id);
-    
+    const existingSession = await gameStatsRepository.findBySessionId(
+      req.body.session_id,
+    );
+
     if (existingSession) {
       // Session already saved, return existing data
       return res.status(200).json(existingSession);
@@ -51,7 +53,6 @@ router.post("/", authenticateUser, async (req: AuthRequest, res: Response) => {
 
     res.status(201).json(gameStats);
   } catch (error) {
-    console.error("Error saving game stats:", error);
     res.status(500).json({ error: "Failed to save game stats" });
   }
 });
@@ -65,7 +66,6 @@ router.get(
       const history = await gameStatsRepository.findByUserId(req.user!.id, 50);
       res.json(history);
     } catch (error) {
-      console.error("Error fetching game history:", error);
       res.status(500).json({ error: "Failed to fetch game history" });
     }
   },
@@ -80,7 +80,6 @@ router.get(
       const stats = await gameStatsRepository.getAggregateStats(req.user!.id);
       res.json(stats);
     } catch (error) {
-      console.error("Error calculating aggregate stats:", error);
       res.status(500).json({ error: "Failed to calculate stats" });
     }
   },
@@ -102,7 +101,6 @@ router.get(
       const stats = await gameStatsRepository.findByUserId(userId, 50);
       res.json(stats);
     } catch (error) {
-      console.error("Error fetching user stats:", error);
       res.status(500).json({ error: "Failed to fetch stats" });
     }
   },

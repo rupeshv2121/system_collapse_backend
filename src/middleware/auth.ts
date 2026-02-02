@@ -36,7 +36,6 @@ export const authenticateUser = async (
     req.user = { id: user.id, email: user.email };
     next();
   } catch (error) {
-    console.error("Authentication error:", error);
     res.status(500).json({ error: "Authentication failed" });
   }
 };

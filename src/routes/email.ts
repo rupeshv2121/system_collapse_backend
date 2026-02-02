@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { body, validationResult } from "express-validator";
 import { sendProfileEmail } from "../services/emailService";
 
@@ -31,13 +31,12 @@ router.post(
         success: true,
       });
     } catch (error: any) {
-      console.error("Error sending email:", error);
       res.status(500).json({
         error: "Failed to send email",
         message: error.message,
       });
     }
-  }
+  },
 );
 
 export default router;

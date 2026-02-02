@@ -10,7 +10,6 @@ router.get("/global", async (req: Request, res: Response) => {
     const leaderboard = await leaderboardRepository.getGlobalLeaderboard(limit);
     res.json(leaderboard);
   } catch (error) {
-    console.error("Error fetching leaderboard:", error);
     res.status(500).json({ error: "Failed to fetch leaderboard" });
   }
 });
@@ -22,7 +21,6 @@ router.get("/top-winners", async (req: Request, res: Response) => {
     const topWinners = await leaderboardRepository.getTopWinners(limit);
     res.json(topWinners);
   } catch (error) {
-    console.error("Error fetching top winners:", error);
     res.status(500).json({ error: "Failed to fetch top winners" });
   }
 });
@@ -45,7 +43,6 @@ router.get("/period/:period", async (req: Request, res: Response) => {
     );
     res.json(leaderboard);
   } catch (error) {
-    console.error("Error fetching period leaderboard:", error);
     res.status(500).json({ error: "Failed to fetch period leaderboard" });
   }
 });

@@ -39,7 +39,6 @@ app.use("/api/email", emailRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: any) => {
-  console.error(err.stack);
   res.status(500).json({ error: "Something went wrong!" });
 });
 

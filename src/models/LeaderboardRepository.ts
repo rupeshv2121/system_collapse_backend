@@ -12,14 +12,11 @@ export class LeaderboardRepository {
    */
   async getGlobalLeaderboard(limit: number = 100): Promise<LeaderboardEntry[]> {
     // Use a subquery to get the best score per user, then join with game_stats to get full details
-    const { data, error } = await supabase.rpc('get_best_scores_per_user', {
-      result_limit: limit
+    const { data, error } = await supabase.rpc("get_best_scores_per_user", {
+      result_limit: limit,
     });
 
     if (error) {
-      // If the RPC doesn't exist, fall back to application-level logic
-      console.warn('RPC get_best_scores_per_user not found, using fallback logic');
-      
       // Get all game stats with profiles
       const { data: allStats, error: statsError } = await supabase
         .from("game_stats")
@@ -37,10 +34,13 @@ export class LeaderboardRepository {
 
       // Group by user and keep only the best score
       const bestScoresMap = new Map<string, any>();
-      
+
       for (const entry of allStats) {
         const userId = entry.user_id;
-        if (!bestScoresMap.has(userId) || entry.final_score > bestScoresMap.get(userId).final_score) {
+        if (
+          !bestScoresMap.has(userId) ||
+          entry.final_score > bestScoresMap.get(userId).final_score
+        ) {
           bestScoresMap.set(userId, entry);
         }
       }
@@ -177,10 +177,13 @@ export class LeaderboardRepository {
 
     // Group by user and keep only the best score
     const bestScoresMap = new Map<string, any>();
-    
+
     for (const entry of data) {
       const userId = entry.user_id;
-      if (!bestScoresMap.has(userId) || entry.final_score > bestScoresMap.get(userId).final_score) {
+      if (
+        !bestScoresMap.has(userId) ||
+        entry.final_score > bestScoresMap.get(userId).final_score
+      ) {
         bestScoresMap.set(userId, entry);
       }
     }
