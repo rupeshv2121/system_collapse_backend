@@ -67,9 +67,8 @@ export class LeaderboardRepository {
     }));
   }
 
-  /**
-   * Get top winners by win count
-   */
+  // Get top winners by win count
+
   async getTopWinners(limit: number = 20): Promise<TopWinner[]> {
     const { data, error } = await supabase
       .from("game_stats")
@@ -103,9 +102,9 @@ export class LeaderboardRepository {
       .slice(0, limit);
   }
 
-  /**
-   * Get user's leaderboard rank by score
-   */
+
+  // Get user's leaderboard rank by score
+
   async getUserRank(userId: string): Promise<number | null> {
     // Get user's best score
     const { data: userBest, error: userError } = await supabase

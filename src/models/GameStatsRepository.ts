@@ -1,14 +1,11 @@
-/*
-Database operations for game statistics
- */
+{/* Database operations for game statistics */}
 
 import { supabase } from "../config/supabase";
 import type { AggregateStats, CreateGameStatsInput, GameStats } from "./types";
 
 export class GameStatsRepository {
-  /*
-   Create new game stats entry
-   */
+  // Create new game stats entry
+
   async create(statsData: CreateGameStatsInput): Promise<GameStats> {
     const { data, error } = await supabase
       .from("game_stats")
@@ -28,9 +25,8 @@ export class GameStatsRepository {
     return data;
   }
 
-  /*
-   Get all game stats for a user
-   */
+
+  // Get all game stats for a user
   async findByUserId(userId: string, limit: number = 50): Promise<GameStats[]> {
     const { data, error } = await supabase
       .from("game_stats")
@@ -46,9 +42,9 @@ export class GameStatsRepository {
     return data || [];
   }
 
-  /*
-   Get game stats by session ID
-   */
+
+  // Get game stats by session ID
+
   async findBySessionId(sessionId: string): Promise<GameStats | null> {
     const { data, error } = await supabase
       .from("game_stats")

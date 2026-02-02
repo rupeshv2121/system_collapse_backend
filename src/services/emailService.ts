@@ -1,8 +1,7 @@
 import nodemailer from "nodemailer";
 
-/*
- * Send user profile statistics via email
- */
+{/* Send user profile statistics via email */}
+
 export async function sendProfileEmail(
   to: string,
   subject: string,

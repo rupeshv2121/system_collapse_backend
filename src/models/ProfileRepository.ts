@@ -1,14 +1,11 @@
-/*
-Handles all database operations for user profiles
- */
+{/* Handles all database operations for user profiles */}
 
 import { supabase } from "../config/supabase";
 import type { CreateProfileInput, Profile, UpdateProfileInput } from "./types";
 
 export class ProfileRepository {
-  /*
-   Find profile by user ID
-   */
+
+  // Find profile by user ID
   async findById(userId: string): Promise<Profile | null> {
     const { data, error } = await supabase
       .from("profiles")
@@ -26,9 +23,8 @@ export class ProfileRepository {
     return data;
   }
 
-  /**
-   * Create or update profile
-   */
+  // Create or update profile
+
   async upsert(profileData: CreateProfileInput): Promise<Profile> {
     const { data, error } = await supabase
       .from("profiles")
@@ -56,9 +52,9 @@ export class ProfileRepository {
     return data;
   }
 
-  /**
-   * Update existing profile
-   */
+  
+  // Update existing profile
+
   async update(userId: string, updates: UpdateProfileInput): Promise<Profile> {
     const { data, error } = await supabase
       .from("profiles")
@@ -77,9 +73,9 @@ export class ProfileRepository {
     return data;
   }
 
-  /**
-   * Delete profile
-   */
+
+   // Delete profile
+
   async delete(userId: string): Promise<void> {
     const { error } = await supabase.from("profiles").delete().eq("id", userId);
 
@@ -88,9 +84,9 @@ export class ProfileRepository {
     }
   }
 
-  /**
-   * Check if profile exists
-   */
+
+   // Check if profile exists
+   
   async exists(userId: string): Promise<boolean> {
     const { data, error } = await supabase
       .from("profiles")

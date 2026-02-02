@@ -4,10 +4,9 @@ import { sendProfileEmail } from "../services/emailService";
 
 const router = Router();
 
-/**
- * POST /api/email/share-profile
- * Send user profile statistics via email
- */
+// POST /api/email/share-profile
+// Send user profile statistics via email
+
 router.post(
   "/share-profile",
   [
