@@ -6,7 +6,6 @@
 - [Technology Stack](#technology-stack)
 - [Project Architecture](#project-architecture)
 - [Installation & Setup](#installation--setup)
-- [Environment Configuration](#environment-configuration)
 - [Database Schema](#database-schema)
 - [API Endpoints Reference](#api-endpoints-reference)
 - [Authentication & Security](#authentication--security)
@@ -16,9 +15,7 @@
 - [Services](#services)
 - [Error Handling](#error-handling)
 - [Deployment Guide](#deployment-guide)
-- [Testing & Debugging](#testing--debugging)
 - [Performance Optimization](#performance-optimization)
-- [Common Issues & Solutions](#common-issues--solutions)
 
 ---
 
@@ -1236,25 +1233,6 @@ npm run build
    sudo certbot --nginx -d api.yourdomain.com
    ```
 ---
-### Manual Testing
-
-#### Health Check
-
-```bash
-curl http://localhost:3000/
-# Expected: {"message": "System Drift Backend API"}
-```
-
-#### Test Authentication
-
-```bash
-# Get token from frontend login
-TOKEN="your-jwt-token"
-
-# Test profile endpoint
-curl -H "Authorization: Bearer $TOKEN" \
-  http://localhost:3000/api/profile
-```
 
 ### Debug Logging
 
