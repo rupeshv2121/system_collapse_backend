@@ -1,10 +1,10 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application, Request, Response } from "express";
+import emailRoutes from "./routes/email";
 import gameStatsRoutes from "./routes/gameStats";
 import leaderboardRoutes from "./routes/leaderboard";
 import profileRoutes from "./routes/profile";
-import emailRoutes from "./routes/email";
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ app.use(express.json());
 
 // Routes
 app.get("/", (req: Request, res: Response) => {
-  res.json({ message: "System Collapse Backend API" });
+  res.json({ message: "System Drift Backend API" });
 });
 
 app.use("/api/profile", profileRoutes);

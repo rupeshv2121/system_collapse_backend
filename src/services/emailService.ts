@@ -7,7 +7,7 @@ import nodemailer from "nodemailer";
 export async function sendProfileEmail(
   to: string,
   subject: string,
-  content: string
+  content: string,
 ): Promise<void> {
   // Create transporter using environment variables
   const transporter = nodemailer.createTransport({
@@ -20,7 +20,7 @@ export async function sendProfileEmail(
 
   // Email options
   const mailOptions = {
-    from: `System Collapse <${process.env.EMAIL_USER}>`,
+    from: `System Drift <${process.env.EMAIL_USER}>`,
     to,
     subject,
     text: content,

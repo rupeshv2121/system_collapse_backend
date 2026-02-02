@@ -1,7 +1,7 @@
 {
   "name": "system_collapse_backend",
   "version": "1.0.0",
-  "description": "Backend API for System Collapse game",
+  "description": "Backend API for System Drift game",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",

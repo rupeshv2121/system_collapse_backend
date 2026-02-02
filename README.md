@@ -1,4 +1,4 @@
-# System Collapse Backend - (Documentation)
+# System Drift Backend - (Documentation)
 
 ## Table of Contents
 
@@ -15,7 +15,6 @@
 - [Middleware](#middleware)
 - [Services](#services)
 - [Error Handling](#error-handling)
-- [Development Workflow](#development-workflow)
 - [Deployment Guide](#deployment-guide)
 - [Testing & Debugging](#testing--debugging)
 - [Performance Optimization](#performance-optimization)
@@ -25,7 +24,7 @@
 
 ## Overview
 
-The System Collapse Backend is a RESTful API server built with Node.js and Express.js that powers the System Collapse psychological game. It handles user authentication, profile management, game statistics tracking, leaderboard rankings, and email notifications.
+The System Drift Backend is a RESTful API server built with Node.js and Express.js that powers the System Drift psychological game. It handles user authentication, profile management, game statistics tracking, leaderboard rankings, and email notifications.
 
 ### Key Features
 
@@ -757,7 +756,7 @@ Content-Type: application/json
 ```json
 {
   "to": "friend@example.com",
-  "subject": "Check out my System Collapse stats!",
+  "subject": "Check out my System Drift stats!",
   "content": "My stats:\nTotal Games: 25\nWins: 15\nHighest Score: 950"
 }
 ```
@@ -1276,34 +1275,6 @@ Or with validation errors:
 
 ---
 
-## Development Workflow
-
-### Development Commands
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server (auto-reload)
-npm run dev
-
-# Build TypeScript to JavaScript
-npm run build
-
-# Start production server
-npm start
-
-# Check TypeScript types
-npx tsc --noEmit
-```
-
-**Key Tools**:
-- **Nodemon**: Auto-restarts server on file changes during development
-- **TypeScript**: Compiles to JavaScript for production (see `tsconfig.json`)
-- **ts-node**: Runs TypeScript directly in development mode
-
----
-
 ## Deployment Guide
 
 ### Production Build
@@ -1426,66 +1397,14 @@ npm run build
    sudo apt install certbot python3-certbot-nginx
    sudo certbot --nginx -d api.yourdomain.com
    ```
-
-### Pre-Deployment Checklist
-
-- [ ] All environment variables set correctly
-- [ ] Supabase database schema deployed
-- [ ] Frontend CORS origin configured
-- [ ] Email service tested (if using)
-- [ ] Build completes without errors: `npm run build`
-- [ ] TypeScript compilation successful: `npx tsc --noEmit`
-- [ ] Test API endpoints with production credentials
-- [ ] Database RLS policies enabled
-- [ ] Service role key secured (never exposed to frontend)
-- [ ] HTTPS/SSL certificate configured
-- [ ] Monitor server logs for errors
-
-### Post-Deployment Testing
-
-```bash
-# Health check
-curl https://your-api-domain.com/
-
-# Test authenticated endpoint (replace with real token)
-curl -H "Authorization: Bearer <token>" \
-  https://your-api-domain.com/api/profile
-
-# Test leaderboard
-curl https://your-api-domain.com/api/leaderboard/global
-```
-
-### Monitoring & Logging
-
-**Recommended Tools**:
-- **Heroku**: Built-in logs via `heroku logs --tail`
-- **Railway**: Dashboard logs
-- **VPS**: PM2 logs via `pm2 logs`
-- **Third-party**: Sentry, LogRocket, DataDog
-
-**Health Monitoring**:
-```typescript
-// Add to index.ts
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  })
-})
-```
-
 ---
-
-## Testing & Debugging
-
 ### Manual Testing
 
 #### Health Check
 
 ```bash
 curl http://localhost:3000/
-# Expected: {"message": "System Collapse Backend API"}
+# Expected: {"message": "System Drift Backend API"}
 ```
 
 #### Test Authentication
@@ -1571,205 +1490,6 @@ Consider adding Redis for:
 
 ---
 
-## Common Issues & Solutions
-
-### "Cannot connect to Supabase" Error
-
-**Symptoms**: Database queries fail, authentication doesn't work
-
-**Solutions**:
-1. Verify `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env`
-2. Check Supabase dashboard for project status
-3. Ensure network connectivity: `ping your-project.supabase.co`
-4. Verify API keys haven't been regenerated
-5. Check Supabase service status: [status.supabase.com](https://status.supabase.com)
-
-### "Authentication failed" / 401 Errors
-
-**Symptoms**: Protected endpoints return unauthorized
-
-**Solutions**:
-1. Check JWT token is valid (not expired)
-2. Verify `Authorization: Bearer <token>` header format
-3. Ensure token is from correct Supabase project
-4. Check auth middleware is applied to route
-5. Verify user exists in Supabase Auth
-
-### "Row Level Security policy violated" Error
-
-**Symptoms**: Database operations fail with RLS error
-
-**Solutions**:
-```sql
--- Check if RLS policies exist
-SELECT * FROM pg_policies WHERE tablename = 'profiles';
-
--- Temporarily disable RLS for testing (NOT for production)
-ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
-
--- Re-create missing policies (see Database Schema section)
-```
-
-### Email Not Sending
-
-**Symptoms**: `/api/email/share-profile` returns success but no email received
-
-**Solutions**:
-1. **Gmail App Password**: Use app-specific password, not account password
-   - Go to Google Account → Security → 2-Step Verification → App passwords
-2. **Check credentials**: Verify `EMAIL_USER` and `EMAIL_PASSWORD` in `.env`
-3. **Test with nodemailer**:
-   ```typescript
-   await transporter.verify()
-   console.log('SMTP connection successful')
-   ```
-4. **Check spam folder**: Email might be filtered
-5. **Enable less secure apps** (not recommended): Google Account settings
-
-### Port Already in Use
-
-**Symptoms**: `Error: listen EADDRINUSE: address already in use :::3000`
-
-**Solutions**:
-```bash
-# Windows - Find and kill process
-netstat -ano | findstr :3000
-taskkill /PID <process_id> /F
-
-# Linux/Mac - Find and kill process
-lsof -i :3000
-kill -9 <PID>
-
-# Or use different port
-PORT=3001 npm run dev
-```
-
-### TypeScript Build Errors
-
-**Symptoms**: `npm run build` fails with type errors
-
-**Solutions**:
-```bash
-# Check specific errors
-npx tsc --noEmit
-
-# Clear build cache
-rm -rf dist/ node_modules/.cache
-
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-
-# Update TypeScript
-npm install typescript@latest --save-dev
-```
-
-### CORS Errors
-
-**Symptoms**: Frontend can't access API, browser shows CORS error
-
-**Solutions**:
-1. **Verify FRONTEND_URL** matches actual frontend domain
-2. **Check CORS configuration**:
-   ```typescript
-   app.use(cors({
-     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-     credentials: true,
-     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-     allowedHeaders: ['Content-Type', 'Authorization']
-   }))
-   ```
-3. **Production**: Update FRONTEND_URL to production domain
-4. **Multiple origins**:
-   ```typescript
-   origin: ['https://app.example.com', 'https://www.example.com']
-   ```
-
-### Database Connection Timeouts
-
-**Symptoms**: Queries hang or timeout
-
-**Solutions**:
-1. Check Supabase connection pooling limits
-2. Verify database isn't paused (free tier auto-pauses)
-3. Check network latency to Supabase region
-4. Implement connection retry logic
-5. Use database connection pooling
-
-### Session_id Already Exists Error
-
-**Symptoms**: Duplicate session error when saving game stats
-
-**Expected**: This is normal behavior - prevents duplicate submissions
-
-**Solution**: Frontend should generate unique session IDs (UUID v4)
-
-### Environment Variables Not Loading
-
-**Symptoms**: `undefined` values for `process.env.VARIABLE_NAME`
-
-**Solutions**:
-1. **Check .env file exists** in project root
-2. **Restart server** after changing .env
-3. **Verify dotenv is loaded**:
-   ```typescript
-   import 'dotenv/config'  // At top of index.ts
-   ```
-4. **Check for typos** in variable names
-5. **No spaces around =**:
-   ```env
-   # Wrong
-   PORT = 3000
-   
-   # Correct
-   PORT=3000
-   ```
-
-### High Memory Usage
-
-**Symptoms**: Server crashes or slows down over time
-
-**Solutions**:
-1. Implement result limiting in queries
-2. Add pagination for large datasets
-3. Close database connections properly
-4. Monitor with: `node --inspect dist/index.js`
-5. Use PM2 with memory limits:
-   ```bash
-   pm2 start dist/index.js --max-memory-restart 500M
-   ```
-
-### Debugging Tips
-
-1. **Enable detailed logging**:
-   ```typescript
-   console.log('User ID:', req.user?.id)
-   console.log('Request body:', JSON.stringify(req.body, null, 2))
-   console.log('Supabase error:', error)
-   ```
-
-2. **Test endpoints with curl**:
-   ```bash
-   # Test with verbose output
-   curl -v -H "Authorization: Bearer $TOKEN" \
-     http://localhost:3000/api/profile
-   ```
-
-3. **Use Postman/Insomnia** for API testing
-
-4. **Check Supabase logs**: Dashboard → Logs
-
-5. **Monitor server logs**:
-   ```bash
-   # Development
-   npm run dev
-   
-   # Production (PM2)
-   pm2 logs system-collapse-api
-   ```
-
----
-
 ## Additional Resources
 
 ### Official Documentation
@@ -1801,15 +1521,6 @@ For issues, questions, or contributions:
 ## 📄 License
 
 This project is part of a hackathon submission. All rights reserved by the development team.
-
----
-
-## 📌 Version Information
-
-**Current Version**: 1.0.0  
-**Last Updated**: February 2026  
-**Minimum Node Version**: 18.0.0  
-**TypeScript Version**: 5.7+
 
 ---
 
