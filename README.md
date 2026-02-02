@@ -216,20 +216,20 @@ The database consists of 3 main tables:
 
 #### What the Schema Creates:
 
-✅ **Tables:**
+**Tables:**
 - `profiles` - User profiles with psychological traits
 - `game_stats` - Game session statistics and behavior metrics
 
-✅ **Security:**
+**Security:**
 - Row Level Security (RLS) policies
 - User-specific data access controls
 - Public leaderboard access
 
-✅ **Performance:**
+**Performance:**
 - Optimized indexes for queries
 - Database functions for leaderboards
 
-✅ **Automation:**
+**Automation:**
 - Auto-create profile trigger on user signup
 - Auto-update timestamp triggers
 
@@ -1323,7 +1323,7 @@ Consider adding Redis for:
 
 ---
 
-## 🆘 Support
+## Support
 
 For issues, questions, or contributions:
 1. Check existing issues in the repository
@@ -1334,7 +1334,7 @@ For issues, questions, or contributions:
 
 ---
 
-## 📄 License
+## License
 
 This project is part of a hackathon submission. All rights reserved by the development team.
 
